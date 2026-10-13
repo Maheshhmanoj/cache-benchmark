@@ -14,3 +14,11 @@
 - **Mongo volume:** the seeded catalog survives restarts. Re-seeding every time would waste time.
 - **Redis persistence off (`--save ""`, `--appendonly no`):** a cache is disposable. Disk snapshots could add latency spikes that would pollute the benchmark numbers.
 - **Healthchecks:** Docker reports when each service is actually ready, not just started.
+
+## Iteration 2 - Seed data and index
+- **Faker with a fixed seed (`faker.seed(42)`):** every run generates the same catalog, so results can be reproduced.
+- **10,000 products:** inside the 5,000-10,000 range from the proposal, and big enough that a collection scan is slower than an index lookup.
+- **`productId` field with a unique index:** the API will look products up by this number. Without the index every read would scan the collection and inflate the uncached latency for the wrong reason. The cache has to be compared against a properly indexed database, otherwise the comparison is unfair.
+- **Seed script wipes and reloads:** running it twice gives the same state.
+- **Index demo (Module 4):** a query on `category` + `price` examined all 10,000 documents without an index and 59 with one (`explain("executionStats")`). At this size the time difference is only a few ms, so the docs-examined count is what shows the effect.
+- **`MONGO_URL` and `SEED_COUNT` can be overridden** through environment variables. The defaults work as they are.

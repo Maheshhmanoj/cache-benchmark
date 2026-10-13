@@ -31,7 +31,7 @@ We build a small product-catalog API on **MongoDB**, add **Redis** in front of i
 ## Roadmap
 - [x] 0. Repo setup
 - [x] 1. Docker: MongoDB + Redis
-- [ ] 2. Seed data + index
+- [x] 2. Seed data + index
 - [ ] 3. API, direct mode
 - [ ] 4. API, cache-aside mode
 - [ ] 5. Benchmark harness
@@ -45,4 +45,11 @@ We build a small product-catalog API on **MongoDB**, add **Redis** in front of i
 docker compose up -d      # start MongoDB (27017) and Redis (6379)
 docker compose ps         # both should say "healthy"
 docker compose down       # stop (data in the mongo volume is kept)
+```
+
+## Seeding
+```bash
+npm install
+npm run seed         # 10,000 fake products into MongoDB (db: cachebench)
+npm run index-demo   # same query with and without an index
 ```
