@@ -1,0 +1,8 @@
+﻿node_modules/
+.env
+*.log
+__pycache__/
+.venv/
+.DS_Store
+# raw benchmark output can be large; summarized results go in analysis/
+benchmark/raw/
