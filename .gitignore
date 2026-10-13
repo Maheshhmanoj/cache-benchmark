@@ -6,3 +6,7 @@ __pycache__/
 .DS_Store
 # raw benchmark output can be large; summarized results go in analysis/
 benchmark/raw/
+
+.claude/
+CLAUDE.md
+AGENTS.md
