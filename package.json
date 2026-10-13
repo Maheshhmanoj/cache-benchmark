@@ -1,0 +1,14 @@
+{
+  "name": "cache-benchmark",
+  "version": "1.0.0",
+  "description": "Redis-MongoDB cache benchmarking study",
+  "scripts": {
+    "seed": "node seed/seed.js",
+    "index-demo": "node seed/index-demo.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "mongodb": "^7.7.0"
+  }
+}
