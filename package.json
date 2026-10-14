@@ -4,11 +4,13 @@
   "description": "Redis-MongoDB cache benchmarking study",
   "scripts": {
     "seed": "node seed/seed.js",
-    "index-demo": "node seed/index-demo.js"
+    "index-demo": "node seed/index-demo.js",
+    "start": "node api/server.js"
   },
   "type": "module",
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
+    "express": "^5.3.0",
     "mongodb": "^7.7.0"
   }
 }
