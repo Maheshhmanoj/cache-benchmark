@@ -32,7 +32,7 @@ We build a small product-catalog API on **MongoDB**, add **Redis** in front of i
 - [x] 0. Repo setup
 - [x] 1. Docker: MongoDB + Redis
 - [x] 2. Seed data + index
-- [ ] 3. API, direct mode
+- [x] 3. API, direct mode
 - [ ] 4. API, cache-aside mode
 - [ ] 5. Benchmark harness
 - [ ] 6. Experiments
@@ -53,3 +53,14 @@ npm install
 npm run seed         # 10,000 fake products into MongoDB (db: cachebench)
 npm run index-demo   # same query with and without an index
 ```
+
+## API
+```bash
+npm start            # http://localhost:3000
+```
+| Method | Path | What it does |
+|---|---|---|
+| GET | `/health` | liveness check |
+| GET | `/products/:id` | one product by `productId` |
+| GET | `/products?category=books&limit=20` | list by category (max 100) |
+| PUT | `/products/:id` | update `price` and/or `stock` |

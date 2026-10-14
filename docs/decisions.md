@@ -22,3 +22,13 @@
 - **Seed script wipes and reloads:** running it twice gives the same state.
 - **Index demo (Module 4):** a query on `category` + `price` examined all 10,000 documents without an index and 59 with one (`explain("executionStats")`). At this size the time difference is only a few ms, so the docs-examined count is what shows the effect.
 - **`MONGO_URL` and `SEED_COUNT` can be overridden** through environment variables. The defaults work as they are.
+
+## Iteration 3 - API in direct mode
+- **Express:** minimal, widely known, and little code between the request and the database. Less framework overhead means the numbers mostly reflect the data layer.
+- **Four endpoints, each with a role in the study:** `GET /products/:id` is the main cacheable read, `GET /products?category=` is a heavier read that returns a list, `PUT /products/:id` is the write that will have to invalidate the cache later, and `/health` lets the benchmark check the server is up.
+- **One shared Mongo connection:** the driver keeps a connection pool, so every request reuses it. Opening a new connection per request would measure connection setup, not the query.
+- **`projection: { _id: 0 }`:** hides MongoDB's internal id. The response then contains only our own fields, and the JSON that gets cached later is the same as what the client sees.
+- **`limit` capped at 100:** stops one request from pulling a huge response and skewing the numbers.
+- **PUT sets `updatedAt`:** needed later to see whether a cached copy is stale.
+- **Express 5 handles async errors:** a failed database call returns a 500 error and does not crash the process, so no try/catch wrappers are needed.
+- **Direct mode first, cache second:** this version is the baseline. The cache is added in the next iteration as a switch, so both modes run from one codebase and are compared fairly.
