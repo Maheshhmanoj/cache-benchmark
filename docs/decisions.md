@@ -32,3 +32,14 @@
 - **PUT sets `updatedAt`:** needed later to see whether a cached copy is stale.
 - **Express 5 handles async errors:** a failed database call returns a 500 error and does not crash the process, so no try/catch wrappers are needed.
 - **Direct mode first, cache second:** this version is the baseline. The cache is added in the next iteration as a switch, so both modes run from one codebase and are compared fairly.
+
+## Iteration 4 - Cache-aside with Redis
+- **Cache-aside pattern:** on a read the app checks Redis first. On a hit it returns the stored copy. On a miss it reads MongoDB, stores the result in Redis with a TTL, and returns it. The cache never talks to the database itself, the application does. It is the most common pattern and the one named in the proposal.
+- **One codebase, two modes (`CACHE_MODE`):** the same code and the same endpoints run with or without Redis, so the only difference between the two measurements is the cache. In direct mode the Redis connection is never opened. Checked: zero keys are written in direct mode.
+- **TTL set with `EX` when the value is stored (`CACHE_TTL`, default 60 s):** Redis removes the key itself. This is the knob for the freshness vs speed experiment.
+- **Keys:** `product:<id>` for single products and `list:<category>:<limit>` for lists.
+- **Writes: update MongoDB first, then delete the cached key:** the next read repopulates it from the database. Deleting is simpler and safer than overwriting the cached value, because there is no way for the cache to hold a value the database does not. Tested: after a PUT the next GET returned the new price.
+- **Lists are not invalidated on a PUT:** a changed product can sit in a cached list until the TTL expires. This is deliberate. Tracking which lists contain which product is a lot of extra logic, and it is a clear example of the staleness the TTL experiment is meant to show.
+- **Hits and misses counted in memory (`/stats`):** needed for the hit-ratio charts. The counters reset with `POST /reset`, which also empties Redis, so each benchmark run starts cold. They are per process and are lost on restart, which is fine for a single-server test.
+- **Missing products (404) are not cached:** every request for a nonexistent id goes to MongoDB. Noted as a known limitation. It matters for the unique-query workload, where many requests will not be cache hits at all.
+- **Cache values stored as JSON strings:** simple, readable in `redis-cli`, and the cost of `JSON.parse` is part of what a cache hit really costs.

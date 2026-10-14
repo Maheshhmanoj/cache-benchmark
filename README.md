@@ -33,7 +33,7 @@ We build a small product-catalog API on **MongoDB**, add **Redis** in front of i
 - [x] 1. Docker: MongoDB + Redis
 - [x] 2. Seed data + index
 - [x] 3. API, direct mode
-- [ ] 4. API, cache-aside mode
+- [x] 4. API, cache-aside mode
 - [ ] 5. Benchmark harness
 - [ ] 6. Experiments
 - [ ] 7. Analysis and charts
@@ -56,11 +56,16 @@ npm run index-demo   # same query with and without an index
 
 ## API
 ```bash
-npm start            # http://localhost:3000
+npm start                                   # direct mode, http://localhost:3000
+CACHE_MODE=cache CACHE_TTL=60 npm start     # cache-aside mode (PowerShell: $env:CACHE_MODE="cache")
 ```
 | Method | Path | What it does |
 |---|---|---|
-| GET | `/health` | liveness check |
+| GET | `/health` | liveness check and current mode |
+| GET | `/stats` | cache hits, misses and hit ratio since the last reset |
+| POST | `/reset` | zero the counters and empty Redis |
 | GET | `/products/:id` | one product by `productId` |
 | GET | `/products?category=books&limit=20` | list by category (max 100) |
 | PUT | `/products/:id` | update `price` and/or `stock` |
+
+Settings (environment variables): `CACHE_MODE` (`direct` by default, or `cache`), `CACHE_TTL` in seconds (default 60), `PORT`, `MONGO_URL`, `REDIS_URL`.
